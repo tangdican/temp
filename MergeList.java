@@ -1,38 +1,65 @@
-package edu.princeton.cs.algs4;
-
 import java.util.Arrays;
 
 public class MergeList {
     public static void main(String[] args) {
-        String[] firsts = {"three","one","nine","four"};
-        String[] adds = {"five","one","two","five","o","ffffffffffffffff"};
-        String[] removes = {"six","four"};
+        String[] firsts = {"three","one","nine","four","four"};
+        String[] adds = {"two","five","o","ffffffffffffffff"};
+        String[] removes = {"x","xsix","four"};
         String[] mer = new String[firsts.length+adds.length];
         merge(firsts, adds, mer);
 
         sortByLength(mer);
 
         String[] res = unique(mer);
+        System.out.println(Arrays.toString(res));
 
         sortByLength(removes);
 
-        remove(res, removes);
+        res = remove(res, removes);
 
         descend(res);
         System.out.println(Arrays.toString(res));
     }
 
-    private static void remove(String[] a, String[] b) {
+    private static String[] remove(String[] a, String[] r) {
         int bi = 0;
         int ind = 0;
         for (int loc = 0; loc < a.length; loc++) {
-            if (lessByLength(a[loc], b[bi])) {
+            a[ind] = a[loc];
+            if (lessByLength(a[loc], r[bi]) || (bi == r.length-1 && lessByLength(r[bi], a[loc]))) {
                 ind++;
                 continue;
-            } else if(a[loc].equals(b[bi])) {
-                bi++;
+            } else if (lessByLength(r[bi], a[loc])){
+                ind++;
+                while (lessByLength(r[bi], a[loc]) && bi< r.length-1) {
+                    bi++;
+                }
             }
         }
+        String[] res = new String[ind];
+        System.arraycopy(a,0,res,0,ind);
+        return res;
+    }
+
+    private static String[] remove2(String[] a, String[] r) {
+        int index1 = 0;
+        int index2 = 0;
+        int index = 0;
+        while (index1 < r.length && index2 < a.length) {
+            if (r[index1].equals(a[index2])) {
+//                index1++; // array2没有重复值情况使用
+                index2++;
+            } else if (lessByLength(r[index1], a[index2])) {
+                index1++;
+            } else {
+                a[index++] = a[index2++];
+            }
+        }
+        while (index2 < a.length) {
+            a[index++] = a[index2++];
+        }
+        a = Arrays.copyOf(a, index);
+        return a;
     }
 
     private static void descend(String[] a) {
